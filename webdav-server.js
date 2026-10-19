@@ -4,13 +4,15 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.PORT || 10000;
-const UPLOAD_DIR = process.env.RENDER ? '/var/data/files' : path.join(__dirname, 'files');
+
+// Use a local folder within the app directory for the free tier
+const UPLOAD_DIR = path.join(__dirname, 'files');
 
 if (!fs.existsSync(UPLOAD_DIR)) {
     fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
-// Create WebDAV server mapped to our persistent directory
+// Create WebDAV server mapped to our directory
 const server = new webdav.WebDAVServer({
     storage: new webdav.FileSystem(UPLOAD_DIR),
     autoLoad: true
@@ -18,7 +20,6 @@ const server = new webdav.WebDAVServer({
 
 // HTTP wrapper to handle requests and provide standard HTML fallback
 http.createServer((req, res) => {
-    // Basic root page info
     if (req.url === '/' && req.method === 'GET') {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         return res.end(`
@@ -34,7 +35,6 @@ http.createServer((req, res) => {
         `);
     }
 
-    // Pass everything else to the WebDAV handler
     server.execute(req, res);
 }).listen(PORT, '0.0.0.0', () => {
     console.log(`Render WebDAV Server running on port ${PORT}`);
