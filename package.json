@@ -6,6 +6,7 @@
     "start": "node webdav-server.js"
   },
   "dependencies": {
+    "express": "^4.19.2",
     "webdav-server": "^2.6.3"
   }
 }
