@@ -10,26 +10,24 @@ if (!fs.existsSync(UPLOAD_DIR)) {
     fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
-// Set up User Manager with a username and password
+// User setup for RaiDrive
 const userManager = new webdav.SimpleUserManager();
 const user = userManager.addUser('admin', 'password123', false);
 
-// Set up Privilege Manager to give the user full access
 const privilegeManager = new webdav.SimplePathPrivilegeManager();
 privilegeManager.setRights(user, '/', ['all']);
 
 const server = new webdav.WebDAVServer({
     httpAuthentication: new webdav.HTTPBasicAuthentication(userManager),
     privilegeManager: privilegeManager,
-    storage: new webdav.FileSystem(UPLOAD_DIR),
-    autoLoad: true
+    storage: new webdav.FileSystem(UPLOAD_DIR)
 });
 
 const app = express();
 
-// Mount WebDAV server onto root path
+// Mount WebDAV route
 app.use(webdav.extensions.express('/', server));
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Render WebDAV Server running on port ${PORT}`);
+    console.log(`✅ Render WebDAV Server is LIVE on port ${PORT}`);
 });
